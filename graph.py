@@ -49,7 +49,6 @@ class Graph:
         else:
             return False
 
-# TODO: Figure out the algorithm we were given
     def shortest_path(self, src: str, dest: str) -> list[str]:
         if src not in self.graph.keys() or dest not in self.graph.keys():
             return None
