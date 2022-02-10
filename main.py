@@ -4,12 +4,8 @@
 # Purpose:
 #   driver for CS360 Project 1: Solving Rush Hour
 
-# declare cars dict at module level so i can update it in the
-# move car function
-cars = {}
 
-
-def move_car(car_id: str, direction: int, board_state: list) -> list:
+def move_car(cars: dict, car_id: str, direction: int, board_state: list) -> list:
     car_x = cars[car_id][0]
     car_y = cars[car_id][1]
     car_length = cars[car_id][2]
@@ -67,6 +63,7 @@ def main():
     # read test board into cars dict
     with open('test.board', 'r') as file:
         first_line = True
+        cars = {}
         for line in file:
             line = line.rstrip('\n')
             if first_line:
@@ -104,9 +101,6 @@ def main():
         for column in row:
             print(column, end='\t')
         print()
-    print('\n\n')
-    first_state = move_car('4', -1, test_list)
-
 
 
 if __name__ == '__main__':
