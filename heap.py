@@ -16,7 +16,7 @@ class Heap:
         else:
             self.list = []
 
-    def add(self, item):
+    def add(self, item: list):
         self.list.append(item)
         current = self.list.index(item)
         while (self.list[self.__calc_parent(current)][0] > item[0]) \
@@ -27,10 +27,10 @@ class Heap:
             self.list[current] = temp
             current = self.__calc_parent(current)
 
-    def peek(self) -> int:
+    def peek(self):
         return self.list[0][0]
 
-    def pop(self) -> int:
+    def pop(self):
         popped = self.list[0]
         self.list[0] = self.list[len(self.list) - 1]
         self.list.pop()

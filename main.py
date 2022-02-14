@@ -3,45 +3,7 @@
 # Created on: 7 Feb 2022
 # Purpose:
 #   driver for CS360 Project 1: Solving Rush Hour
-
-
-def move_car(cars: dict, car_id: str, direction: int, board_state: list) -> list:
-    car_x = cars[car_id][0]
-    car_y = cars[car_id][1]
-    car_length = cars[car_id][2]
-    # horizontal moving forward 1
-    if cars[car_id][3] and direction > 0:
-        if board_state[car_y][car_x + car_length] == -1:
-            board_state[car_y][car_x] = -1
-            board_state[car_y][car_x + car_length] = car_id
-            cars[car_id][0] = car_x + 1
-        else:
-            return None
-    # horizontal moving backward 1
-    elif cars[car_id][3] and direction < 0:
-        if board_state[car_y][car_x - 1] == -1:
-            board_state[car_y][car_x + car_length - 1] = -1
-            board_state[car_y][car_x - 1] = car_id
-            cars[car_id][0] = car_x - 1
-        else:
-            return None
-    # vertical moving up 1
-    elif not cars[car_id][3] and direction < 0:
-        if board_state[car_y - 1][car_x] == -1:
-            board_state[car_y + car_length - 1][car_x] = -1
-            board_state[car_y - 1][car_x] = car_id
-            cars[car_id][1] = car_y - 1
-        else:
-            return None
-    # vertical moving down 1
-    elif not cars[car_id][3] and direction > 0:
-        if board_state[car_y + car_length][car_x] == -1:
-            board_state[car_y][car_x] = -1
-            board_state[car_y + car_length][car_x] = car_id
-            cars[car_id][1] = car_y + 1
-        else:
-            return None
-    return board_state
+from functions import *
 
 
 def main():
@@ -64,9 +26,11 @@ def main():
     with open('test.board', 'r') as file:
         first_line = True
         cars = {}
+        board_dimensions = [0, 0]
         for line in file:
             line = line.rstrip('\n')
             if first_line:
+                board_dimensions = line.split(',')
                 first_line = False
                 continue
             if line == '':
@@ -79,13 +43,15 @@ def main():
 
     # board represented with nested lists
     test_list = []
-    for i in range(6):
+    for i in range(int(board_dimensions[0])):
         test_list.append([])
-        for j in range(6):
+        for j in range(int(board_dimensions[1])):
             test_list[i].append(-1)
 
     # place cars on the board
     for car in cars:
+        if cars[car][4]:
+            goal_car_id = car
         x = cars[car][0]
         y = cars[car][1]
         length = cars[car][2]
@@ -101,6 +67,40 @@ def main():
         for column in row:
             print(column, end='\t')
         print()
+
+    print(a_star(cars, test_list, goal_car_id))
+
+
+def a_star(cars: dict, initial_state: list, goal_car: str):
+    visited = []
+    prior_queue = heap.Heap()
+    cost = 0
+    current_state = deepcopy(initial_state)
+    prior_queue.add([f(cost, calculate_heuristic(current_state, goal_car)), (), []])
+    goal_state = False
+    while not goal_state:
+        cost += 1
+        current_cars = {}
+        current_node = prior_queue.pop()
+        if current_node[1] in visited:
+            continue
+        else:
+            # TODO: cannot populate visited with (car, move) has to be board state... dummy
+            visited.append(current_node[1])
+            current_cars, current_state = (move_cars(cars, current_node[2], initial_state)[i]
+                                           for i in range(2))
+            for car in current_cars:
+                for move in can_move(current_cars, car, current_state):
+                    try:
+                        new_state = move_car(current_cars, car, move, current_state)
+                        path = deepcopy(current_node[2])
+                        path.append((car, move))
+                        prior_queue.add([f(cost, calculate_heuristic(new_state, goal_car)), (car, str(move)),
+                                         path])
+                    except TypeError:
+                        continue
+        if is_goal_state(current_state, current_cars, goal_car):
+            return current_node[2].append(current_node[1])
 
 
 if __name__ == '__main__':

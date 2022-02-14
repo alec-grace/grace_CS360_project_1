@@ -60,13 +60,13 @@ class Graph:
         while current[0] != dest:
             for neighbor in self.graph[current[0]]:
                 if neighbor not in visited:
-                    pair = (neighbor, current[1]+[current[0]])
+                    pair = (neighbor, current[1] + [current[0]])
                     visited.append(neighbor)
                     Q.enqueue(pair)
             if Q.is_empty():
                 break
             current = Q.dequeue()
         if current[0] == dest:
-            return current[1]+[current[0]]
+            return current[1] + [current[0]]
         else:
             return None
