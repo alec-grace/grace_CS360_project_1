@@ -140,7 +140,7 @@ def f(cost_to_state: int, heuristic: float):
 def is_goal_state(check_state: list, car_info: dict, goal_car_id: str) -> bool:
     goal_car_x = car_info[goal_car_id][0]
     goal_car_length = car_info[goal_car_id][2]
-    if goal_car_x + goal_car_length == len(check_state[0]) - 1:
+    if goal_car_x + goal_car_length == len(check_state[0]):
         return True
     else:
         return False

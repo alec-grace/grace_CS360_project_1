@@ -4,6 +4,7 @@
 # Purpose:
 #   driver for CS360 Project 1: Solving Rush Hour
 from functions import *
+from time import perf_counter
 
 
 def main():
@@ -23,7 +24,9 @@ def main():
     #         solution_file = None
 
     # read test board into cars dict
-    with open('test.board', 'r') as file:
+
+    board_file = input('Enter board file: ')
+    with open(board_file, 'r') as file:
         first_line = True
         cars = {}
         board_dimensions = [0, 0]
@@ -61,14 +64,16 @@ def main():
         else:
             for i in range(length):
                 test_list[y + i][x] = car
-
-    # print out board for debugging
-    for row in test_list:
-        for column in row:
-            print(column, end='\t')
-        print()
-
-    print(a_star(cars, test_list, goal_car_id))
+    t1_start = perf_counter()
+    solution = a_star(cars, test_list, goal_car_id)
+    t2_stop = perf_counter()
+    total = t2_stop - t1_start
+    print('Total time = %d seconds' % total)
+    with open('my_solution.sol', 'w') as outfile:
+        for pair in solution:
+            outfile.write(str(pair[0]) + ',' + str(pair[1]) + '\n')
+    outfile.close()
+    print(solution)
 
 
 def a_star(cars: dict, initial_state: list, goal_car: str):
@@ -79,16 +84,17 @@ def a_star(cars: dict, initial_state: list, goal_car: str):
     prior_queue.add([f(cost, calculate_heuristic(current_state, goal_car)), (), []])
     goal_state = False
     while not goal_state:
-        cost += 1
         current_cars = {}
         current_node = prior_queue.pop()
-        if current_node[1] in visited:
+        current_cars, current_state = (move_cars(cars, current_node[2], initial_state)[i]
+                                       for i in range(2))
+        if current_state in visited:
             continue
         else:
-            # TODO: cannot populate visited with (car, move) has to be board state... dummy
-            visited.append(current_node[1])
-            current_cars, current_state = (move_cars(cars, current_node[2], initial_state)[i]
-                                           for i in range(2))
+            visited.append(current_state)
+            cost += 1
+            # current_cars, current_state = (move_cars(cars, current_node[2], initial_state)[i]
+            #                                for i in range(2))
             for car in current_cars:
                 for move in can_move(current_cars, car, current_state):
                     try:
@@ -100,7 +106,7 @@ def a_star(cars: dict, initial_state: list, goal_car: str):
                     except TypeError:
                         continue
         if is_goal_state(current_state, current_cars, goal_car):
-            return current_node[2].append(current_node[1])
+            return current_node[2]
 
 
 if __name__ == '__main__':
