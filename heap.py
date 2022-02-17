@@ -2,7 +2,7 @@
 # Author: Alec Grace
 # Created on: 27 Jan 2022
 # Purpose:
-#   class to implement a min heap in main
+#   class to implement a min heap
 
 class Heap:
     def __init__(self, lst=None):
